@@ -1,7 +1,8 @@
 import time
 import os
 import requests
-import datetime
+import logging
+import sys
 
 SCKEY = os.environ["SCKEY"]
 UID = os.environ["UID"]
@@ -14,6 +15,12 @@ interval = 60
 arena_ranks = 15001
 grand_arena_ranks = 15001
 
+logger_raw = logging.getLogger()
+logger_raw.setLevel(logging.INFO)
+formatter1 = logging.Formatter("[%(levelname)s]: %(message)s")
+console_handler = logging.StreamHandler(stream=sys.stdout) #输出到控制台
+console_handler.setFormatter(formatter1)
+logger_raw.addHandler(console_handler)
 
 def push_service():
     requests.get(
@@ -22,12 +29,10 @@ def push_service():
 
 while True:
     rid = requests.get(f'{apiroot}/enqueue?target_viewer_id={UID}')
-    print(rid.json())
     rid_char = rid.json()['reqeust_id']
-    print(rid_char)
     query = requests.get(f'https://help.tencentbot.top/query?request_id={rid_char}')
 
-    print(query.json()['status'])
+    logging.info(query.json()['status'])
     status = query.json()['status']
 
     if status == 'done':
@@ -37,7 +42,7 @@ while True:
 
         if arena_ranks >= temp_arena_ranks:
             arena_ranks = temp_arena_ranks
-            print('jjc:'+str(arena_ranks))
+            logging.info('jjc:'+str(arena_ranks))
             time.sleep(1)
         else:
             new_arena_ranks = temp_arena_ranks
@@ -47,13 +52,12 @@ while True:
                 'desp': f'竞技场排名发生变化：{arena_ranks}->{new_arena_ranks}'
             }
             push_service()
-            print(f'竞技场排名发生变化：{arena_ranks}->{new_arena_ranks}')
-            print(datetime.datetime.now())
+            logging.info(f'竞技场排名发生变化：{arena_ranks}->{new_arena_ranks}')
             time.sleep(interval)
 
         if grand_arena_ranks >= temp_grand_arena_ranks:
             grand_arena_ranks = temp_grand_arena_ranks
-            print('pjjc:'+str(grand_arena_ranks))
+            logging.info('pjjc:'+str(grand_arena_ranks))
             time.sleep(10)
         else:
             new_grand_arena_ranks = temp_grand_arena_ranks
@@ -63,13 +67,11 @@ while True:
                 'desp': f'公主竞技场排名发生变化：{grand_arena_ranks}->{new_grand_arena_ranks}'
             }
             push_service()
-            print(f'公主竞技场排名发生变化：{grand_arena_ranks}->{new_grand_arena_ranks}')
-            print(datetime.datetime.now())
+            logging.info(f'公主竞技场排名发生变化：{grand_arena_ranks}->{new_grand_arena_ranks}')
             time.sleep(interval)
 
     elif status == 'queue':
         time.sleep(3)
     else:
-        print('not found or else')
+        logging.info('not found or else')
         time.sleep(3)
-
