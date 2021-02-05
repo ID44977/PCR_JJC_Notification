@@ -27,4 +27,4 @@ jobs:
         env:
           SCKEY: ${{ secrets.SCKEY }}
           UID: ${{ secrets.UID }}
-        run: bash ./run_Query.sh
+        run: python ./Query.py
