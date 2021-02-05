@@ -28,6 +28,9 @@ def push_service():
 
 
 while True:
+    time.sleep(interval)
+    logging.info('start!')
+    
     rid = requests.get(f'{apiroot}/enqueue?target_viewer_id={UID}', timeout=5)
     rid_char = rid.json()['reqeust_id']
 
@@ -75,9 +78,9 @@ while True:
         elif status == 'queue':
             time.sleep(1)
         else:
-            logging.info('not found or else')
+            logging.error('not found or else')
             time.sleep(3)
     else:
-        logging.info('rid err')
+        logging.error('rid err')
         time.sleep(3)
 
