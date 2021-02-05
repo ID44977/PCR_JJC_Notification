@@ -71,7 +71,7 @@ while True:
             time.sleep(interval)
 
     elif status == 'queue':
-        time.sleep(3)
+        time.sleep(1)
     else:
         logging.info('not found or else')
         time.sleep(3)
