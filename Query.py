@@ -4,10 +4,8 @@ import requests
 import logging
 import sys
 
-'''
 SCKEY = os.environ["SCKEY"]
 UID = os.environ["UID"]
-'''
 
 apiroot = 'http://help.tencentbot.top'
 
@@ -24,6 +22,7 @@ logger_raw.addHandler(console_handler)
 def push_service(msg):
     requests.get(
         f'https://sc.ftqq.com/{SCKEY}.send', params=msg, timeout=5)
+
 
 def get_rank() -> dict:
     rid = requests.get(f'{apiroot}/enqueue?target_viewer_id={UID}', timeout=5)
@@ -47,11 +46,12 @@ def get_rank() -> dict:
             logging.exception('not found or else,重试')
             get_rank()
 
+
 origin_arena_ranks = 15001
 origin_grand_arena_ranks = 15001
 
-def on_arena_schedule():
 
+def on_arena_schedule():
     global origin_arena_ranks
     global origin_grand_arena_ranks
 
