@@ -9,7 +9,6 @@ UID = os.environ["UID"]
 
 apiroot = 'http://help.tencentbot.top'
 
-
 interval = 60
 
 arena_ranks = 15001
@@ -18,9 +17,10 @@ grand_arena_ranks = 15001
 logger_raw = logging.getLogger()
 logger_raw.setLevel(logging.INFO)
 formatter1 = logging.Formatter("[%(levelname)s]: %(message)s")
-console_handler = logging.StreamHandler(stream=sys.stdout) #输出到控制台
+console_handler = logging.StreamHandler(stream=sys.stdout)  # 输出到控制台
 console_handler.setFormatter(formatter1)
 logger_raw.addHandler(console_handler)
+
 
 def push_service():
     requests.get(
@@ -30,7 +30,7 @@ def push_service():
 while True:
     time.sleep(interval)
     logging.info('start!')
-    
+
     rid = requests.get(f'{apiroot}/enqueue?target_viewer_id={UID}', timeout=5)
     rid_char = rid.json()['reqeust_id']
 
@@ -83,4 +83,3 @@ while True:
     else:
         logging.error('rid err')
         time.sleep(3)
-
