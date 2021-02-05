@@ -24,13 +24,13 @@ logger_raw.addHandler(console_handler)
 
 def push_service():
     requests.get(
-        f'https://sc.ftqq.com/{SCKEY}.send', params=url_params)
+        f'https://sc.ftqq.com/{SCKEY}.send', params=url_params, timeout=5)
 
 
 while True:
-    rid = requests.get(f'{apiroot}/enqueue?target_viewer_id={UID}')
+    rid = requests.get(f'{apiroot}/enqueue?target_viewer_id={UID}', timeout=5)
     rid_char = rid.json()['reqeust_id']
-    query = requests.get(f'https://help.tencentbot.top/query?request_id={rid_char}')
+    query = requests.get(f'https://help.tencentbot.top/query?request_id={rid_char}', timeout=5)
 
     logging.info(query.json()['status'])
     status = query.json()['status']
