@@ -21,11 +21,11 @@ logger_raw.addHandler(console_handler)
 
 def push_service(msg):
     requests.get(
-        f'https://sc.ftqq.com/{SCKEY}.send', params=msg, timeout=5)
+        f'https://sc.ftqq.com/{SCKEY}.send', params=msg, timeout=5, verify=False)
 
 
 def get_rank() -> dict:
-    rid = requests.get(f'{apiroot}/enqueue?target_viewer_id={UID}', timeout=5)
+    rid = requests.get(f'{apiroot}/enqueue?target_viewer_id={UID}', timeout=5, verify=False)
     rid_char = rid.json()['reqeust_id']
 
     if rid is None:
@@ -33,7 +33,7 @@ def get_rank() -> dict:
         get_rank()
 
     while True:
-        query = requests.get(f'https://help.tencentbot.top/query?request_id={rid_char}', timeout=5)
+        query = requests.get(f'https://help.tencentbot.top/query?request_id={rid_char}', timeout=5, verify=False)
         logging.info(query.json()['status'])
         status = query.json()['status']
 
