@@ -40,7 +40,7 @@ while True:
         temp_arena_ranks = int(query.json()['data']['user_info']['arena_rank'])
         temp_grand_arena_ranks = int(query.json()['data']['user_info']['grand_arena_rank'])
 
-        if arena_ranks >= temp_arena_ranks:
+        if arena_ranks <= temp_arena_ranks:
             arena_ranks = temp_arena_ranks
             logging.info('jjc:'+str(arena_ranks))
             time.sleep(1)
