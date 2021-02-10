@@ -3,13 +3,25 @@ import os
 import requests
 import logging
 import sys
+import urllib3
 
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+headers = {
+    'User-Agent':
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36'
+}
+
+'''
 SCKEY = os.environ["SCKEY"]
 UID = os.environ["UID"]
+'''
+SCKEY = 'SCU117561Tba9703988b69adb58561921e3ff811345f81af151790d'
+UID = '1137837253174'
 
-apiroot = 'http://help.tencentbot.top'
+apiroot = 'https://help.tencentbot.top'
 
-interval = 60
+interval = 30
 
 logger_raw = logging.getLogger()
 logger_raw.setLevel(logging.INFO)
@@ -27,9 +39,10 @@ def push_service(msg):
 def get_rank() -> dict:
     rid = requests.get(f'{apiroot}/enqueue?target_viewer_id={UID}', timeout=5, verify=False)
     rid_char = rid.json()['reqeust_id']
+    rid_response = rid.status_code
 
-    if rid is None:
-        logging.exception('未取得rid,重试')
+    if rid_response != 200:
+        logging.warning('未取得rid,重试')
         get_rank()
 
     while True:
@@ -43,7 +56,7 @@ def get_rank() -> dict:
             logging.info('排队中')
             time.sleep(1)
         else:
-            logging.exception('not found or else,重试')
+            logging.warning('not found or else,重试')
             get_rank()
 
 
@@ -76,8 +89,8 @@ def on_arena_schedule():
         time.sleep(interval)
 
     if origin_grand_arena_ranks >= new_grand_arena_ranks:
-        grand_arena_ranks = new_grand_arena_ranks
-        logging.info('pjjc:' + str(grand_arena_ranks))
+        origin_grand_arena_ranks = new_grand_arena_ranks
+        logging.info('pjjc:' + str(origin_grand_arena_ranks))
         time.sleep(interval)
     else:
         temp_grand_arena_ranks = origin_grand_arena_ranks
@@ -93,3 +106,4 @@ def on_arena_schedule():
 
 while True:
     on_arena_schedule()
+    time.sleep(interval)
