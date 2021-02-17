@@ -16,6 +16,7 @@ SCKEY = os.environ["SCKEY"]
 UID = os.environ["UID"]
 
 apiroot = 'http://help.tencentbot.top'
+pushapiroot = 'https://sctapi.ftqq.com'
 
 interval = 300
 
@@ -29,7 +30,7 @@ logger_raw.addHandler(console_handler)
 
 def push_service(msg):
     requests.get(
-        f'https://sc.ftqq.com/{SCKEY}.send', params=msg, timeout=5, verify=False)
+        f'pushapiroot/{SCKEY}.send', params=msg, timeout=5, verify=False)
 
 
 def get_rank() -> dict:
@@ -86,7 +87,7 @@ def on_arena_schedule():
         temp_arena_ranks = origin_arena_ranks
         origin_arena_ranks = new_arena_ranks
         url_params = {
-            'text': '竞技场排名变化',
+            'title': '竞技场排名变化',
             'desp': f'竞技场排名发生变化：{temp_arena_ranks}->{new_arena_ranks}'
         }
         logging.info(f'竞技场排名发生变化：{temp_arena_ranks}->{new_arena_ranks}')
