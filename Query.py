@@ -15,9 +15,9 @@ headers = {
 SCKEY = os.environ["SCKEY"]
 UID = os.environ["UID"]
 
-apiroot = 'https://help.tencentbot.top'
+apiroot = 'http://help.tencentbot.top'
 
-interval = 30
+interval = 300
 
 logger_raw = logging.getLogger()
 logger_raw.setLevel(logging.INFO)
@@ -39,21 +39,30 @@ def get_rank() -> dict:
 
     if rid_response != 200:
         logging.warning('未取得rid,重试')
+        logging.warning('rid response code: ' + str(rid_response))
+        time.sleep(10)
         get_rank()
+    else:
+        logging.info('rid response code: ' + str(rid_response))
+        while True:
+            query = requests.get(f'{apiroot}/query?request_id={rid_char}', timeout=5, verify=False)
 
-    while True:
-        query = requests.get(f'https://help.tencentbot.top/query?request_id={rid_char}', timeout=5, verify=False)
-        logging.info(query.json()['status'])
-        status = query.json()['status']
+            query_response = query.status_code
+            if query_response != 200:
+                logging.warning('未取得排名，重试')
+                logging.warning('rank response code: ' + str(query_response))
+                time.sleep(10)
+                get_rank()
+            else:
+                logging.info('rank response code: ' + str(query_response))
+                logging.info(query.json()['status'])
+                status = query.json()['status']
 
-        if status == 'done':
-            return query.json()['data']['user_info']
-        elif status == 'queue':
-            logging.info('排队中')
-            time.sleep(1)
-        else:
-            logging.warning('not found or else,重试')
-            get_rank()
+                if status == 'done':
+                    return query.json()['data']['user_info']
+                elif status == 'queue':
+                    logging.info('排队中')
+                    time.sleep(10)
 
 
 origin_arena_ranks = 15001
