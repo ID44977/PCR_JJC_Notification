@@ -35,24 +35,24 @@ def push_service(msg):
 
 def get_rank() -> dict:
     rid = requests.get(f'{apiroot}/enqueue?target_viewer_id={UID}', timeout=5, verify=False)
-    rid_char = rid.json()['reqeust_id']
     rid_response = rid.status_code
 
     if rid_response != 200:
         logging.warning('未取得rid,重试')
         logging.warning('rid response code: ' + str(rid_response))
-        time.sleep(10)
+        time.sleep(30)
         get_rank()
     else:
         logging.info('rid response code: ' + str(rid_response))
+        rid_char = rid.json()['reqeust_id']
         while True:
             query = requests.get(f'{apiroot}/query?request_id={rid_char}', timeout=5, verify=False)
-
             query_response = query.status_code
+
             if query_response != 200:
                 logging.warning('未取得排名，重试')
                 logging.warning('rank response code: ' + str(query_response))
-                time.sleep(10)
+                time.sleep(30)
                 get_rank()
             else:
                 logging.info('rank response code: ' + str(query_response))
@@ -63,7 +63,11 @@ def get_rank() -> dict:
                     return query.json()['data']['user_info']
                 elif status == 'queue':
                     logging.info('排队中')
-                    time.sleep(10)
+                    time.sleep(30)
+                elif status == 'notfound':
+                    logging.warning('rid过期，重试')
+                    time.sleep(30)
+                    get_rank()
 
 
 origin_arena_ranks = 15001
