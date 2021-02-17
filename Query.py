@@ -18,7 +18,7 @@ UID = os.environ["UID"]
 apiroot = 'http://help.tencentbot.top'
 pushapiroot = 'https://sctapi.ftqq.com'
 
-interval = 300
+interval = 180
 
 logger_raw = logging.getLogger()
 logger_raw.setLevel(logging.INFO)
@@ -29,8 +29,8 @@ logger_raw.addHandler(console_handler)
 
 
 def push_service(msg):
-    requests.get(
-        f'pushapiroot/{SCKEY}.send', params=msg, timeout=5, verify=False)
+    requests.post(
+        f'{pushapiroot}/{SCKEY}.send', params=msg, timeout=5, verify=False)
 
 
 def get_rank() -> dict:
