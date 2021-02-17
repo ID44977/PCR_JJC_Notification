@@ -18,7 +18,7 @@ UID = os.environ["UID"]
 apiroot = 'http://help.tencentbot.top'
 pushapiroot = 'https://sctapi.ftqq.com'
 
-interval = 180
+interval = 300
 
 logger_raw = logging.getLogger()
 logger_raw.setLevel(logging.INFO)
