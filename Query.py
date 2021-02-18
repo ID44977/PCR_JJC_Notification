@@ -30,7 +30,8 @@ apiroot = 'http://help.tencentbot.top'
 pushapiroot = 'https://sctapi.ftqq.com'
 
 # 默认间隔
-interval = 180
+long_invl = 180
+short_invl = 10
 
 # 设置日志格式
 logger_raw = logging.getLogger()
@@ -45,6 +46,7 @@ logger_raw.addHandler(console_handler)
 def push_service(msg):
     requests.post(
         f'{pushapiroot}/{SCKEY}.send', params=msg, timeout=5, verify=False)
+    logging.info('send message')
 
 
 #
@@ -79,7 +81,7 @@ def get_rank() -> dict:
                     return query.json()
                 elif status == 'queue':
                     logging.info('排队中')
-                    time.sleep(10)
+                    time.sleep(short_invl)
                 elif status == 'notfound':
                     logging.warning('rid过期，重试')
                     # time.sleep(interval)
@@ -104,7 +106,7 @@ def on_arena_schedule():
             break
         else:
             logging.warning('retrying')
-            time.sleep(10)
+            time.sleep(short_invl)
 
     new_arena_ranks = int(data['data']['user_info']['arena_rank'])
     new_grand_arena_ranks = int(data['data']['user_info']['grand_arena_rank'])
@@ -112,7 +114,7 @@ def on_arena_schedule():
     if origin_arena_ranks >= new_arena_ranks:
         origin_arena_ranks = new_arena_ranks
         logging.info('jjc:' + str(origin_arena_ranks))
-        time.sleep(1)
+        time.sleep(short_invl)
     else:
         temp_arena_ranks = origin_arena_ranks
         origin_arena_ranks = new_arena_ranks
@@ -122,12 +124,12 @@ def on_arena_schedule():
         }
         logging.info(f'竞技场排名发生变化：{temp_arena_ranks}->{new_arena_ranks}')
         push_service(url_params)
-        time.sleep(interval)
+        # time.sleep(short_invl)
 
     if origin_grand_arena_ranks >= new_grand_arena_ranks:
         origin_grand_arena_ranks = new_grand_arena_ranks
         logging.info('pjjc:' + str(origin_grand_arena_ranks))
-        time.sleep(interval)
+        time.sleep(long_invl)
     else:
         temp_grand_arena_ranks = origin_grand_arena_ranks
         origin_grand_arena_ranks = new_grand_arena_ranks
@@ -137,13 +139,13 @@ def on_arena_schedule():
         }
         logging.info(f'公主竞技场排名发生变化：{temp_grand_arena_ranks}->{new_grand_arena_ranks}')
         push_service(url_params)
-        time.sleep(interval)
+        # time.sleep(long_invl)
 
 
 def main():
     while True:
         on_arena_schedule()
-        time.sleep(interval)
+        time.sleep(long_invl)
 
 
 if __name__ == '__main__':
