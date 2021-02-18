@@ -1,25 +1,38 @@
-import time
-import os
-import requests
 import logging
+import os
+import platform
 import sys
+import time
 import urllib3
+import requests
 
+# 关闭验证警告
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
+# 定义请求头
 headers = {
     'User-Agent':
-        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36'
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
+        'AppleWebKit/537.36 (KHTML, like Gecko) '
+        'Chrome/88.0.4324.104 Safari/537.36'
 }
 
-SCKEY = os.environ["SCKEY"]
-UID = os.environ["UID"]
+# 执行环境判断 建议统一使用secrets以免KEY泄露
+if platform.system() == 'Linux':
+    SCKEY = os.environ["SCKEY"]
+    UID = os.environ["UID"]
+else:
+    SCKEY = 'default'
+    UID = 'default'
 
+# api
 apiroot = 'http://help.tencentbot.top'
 pushapiroot = 'https://sctapi.ftqq.com'
 
-interval = 300
+# 默认间隔
+interval = 180
 
+# 设置日志格式
 logger_raw = logging.getLogger()
 logger_raw.setLevel(logging.INFO)
 formatter1 = logging.Formatter("[%(levelname)s]: %(message)s")
@@ -28,11 +41,13 @@ console_handler.setFormatter(formatter1)
 logger_raw.addHandler(console_handler)
 
 
+# 推送
 def push_service(msg):
     requests.post(
         f'{pushapiroot}/{SCKEY}.send', params=msg, timeout=5, verify=False)
 
 
+#
 def get_rank() -> dict:
     rid = requests.get(f'{apiroot}/enqueue?target_viewer_id={UID}', timeout=5, verify=False)
     rid_response = rid.status_code
@@ -40,8 +55,8 @@ def get_rank() -> dict:
     if rid_response != 200:
         logging.warning('未取得rid,重试')
         logging.warning('rid response code: ' + str(rid_response))
-        time.sleep(30)
-        get_rank()
+        # time.sleep(interval)
+        return {'status': 'false'}
     else:
         logging.info('rid response code: ' + str(rid_response))
         rid_char = rid.json()['reqeust_id']
@@ -52,36 +67,47 @@ def get_rank() -> dict:
             if query_response != 200:
                 logging.warning('未取得排名，重试')
                 logging.warning('rank response code: ' + str(query_response))
-                time.sleep(30)
-                get_rank()
+                # time.sleep(interval)
+                return {'status': 'false'}
             else:
                 logging.info('rank response code: ' + str(query_response))
                 logging.info(query.json()['status'])
                 status = query.json()['status']
 
                 if status == 'done':
-                    return query.json()['data']['user_info']
+                    # return query.json()['data']['user_info']
+                    return query.json()
                 elif status == 'queue':
                     logging.info('排队中')
-                    time.sleep(30)
+                    time.sleep(10)
                 elif status == 'notfound':
                     logging.warning('rid过期，重试')
-                    time.sleep(30)
-                    get_rank()
+                    # time.sleep(interval)
+                    return {'status': 'false'}
 
 
+# 初始化jjc排名
 origin_arena_ranks = 15001
 origin_grand_arena_ranks = 15001
 
 
+# 排名变化相关的逻辑处理
 def on_arena_schedule():
     global origin_arena_ranks
     global origin_grand_arena_ranks
 
-    data = get_rank()
+    # 循环调用get_rank()直到正确获得排名信息
+    while True:
+        data = get_rank()
+        if data['status'] != 'false':
+            # logging.info(data)
+            break
+        else:
+            logging.warning('retrying')
+            time.sleep(10)
 
-    new_arena_ranks = int(data['arena_rank'])
-    new_grand_arena_ranks = int(data['grand_arena_rank'])
+    new_arena_ranks = int(data['data']['user_info']['arena_rank'])
+    new_grand_arena_ranks = int(data['data']['user_info']['grand_arena_rank'])
 
     if origin_arena_ranks >= new_arena_ranks:
         origin_arena_ranks = new_arena_ranks
@@ -114,6 +140,11 @@ def on_arena_schedule():
         time.sleep(interval)
 
 
-while True:
-    on_arena_schedule()
-    time.sleep(interval)
+def main():
+    while True:
+        on_arena_schedule()
+        time.sleep(interval)
+
+
+if __name__ == '__main__':
+    main()
