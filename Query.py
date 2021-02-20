@@ -24,8 +24,8 @@ if platform.system() == 'Linux':
     SCKEY = os.environ["SCKEY"]
     UID = os.environ["UID"]
 else:
-    SCKEY = 'SCT8665TAFaVfV8NeHWzhUxOlQNO2riy'
-    UID = '1137837253174'
+    SCKEY = 'default'
+    UID = 'default'
 
 # api
 apiroot = 'http://help.tencentbot.top'
