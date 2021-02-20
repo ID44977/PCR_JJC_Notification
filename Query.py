@@ -32,7 +32,7 @@ pushapiroot = 'https://sctapi.ftqq.com'
 
 # 默认间隔
 long_invl = 180
-short_invl = 10
+short_invl = 5
 
 # 设置日志格式
 logger_raw = logging.getLogger()
