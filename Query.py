@@ -5,6 +5,8 @@ import sys
 import time
 import urllib3
 import requests
+import random
+from retrying import retry
 
 # 关闭验证警告
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -22,8 +24,8 @@ if platform.system() == 'Linux':
     SCKEY = os.environ["SCKEY"]
     UID = os.environ["UID"]
 else:
-    SCKEY = 'default'
-    UID = 'default'
+    SCKEY = 'SCT8665TAFaVfV8NeHWzhUxOlQNO2riy'
+    UID = '1137837253174'
 
 # api
 apiroot = 'http://help.tencentbot.top'
@@ -45,13 +47,14 @@ logger_raw.addHandler(console_handler)
 # 推送
 def push_service(msg):
     requests.post(
-        f'{pushapiroot}/{SCKEY}.send', params=msg, timeout=5, verify=False)
+        f'{pushapiroot}/{SCKEY}.send', params=msg, headers=headers, verify=False)
     logging.info('send message')
 
 
 #
 def get_rank() -> dict:
-    rid = requests.get(f'{apiroot}/enqueue?target_viewer_id={UID}', timeout=5, verify=False)
+    rid = requests.get(f'{apiroot}/enqueue?target_viewer_id={UID}', headers=headers, verify=False)
+    logging.info('break point at get_rank56')
     rid_response = rid.status_code
 
     if rid_response != 200:
@@ -63,7 +66,8 @@ def get_rank() -> dict:
         logging.info('rid response code: ' + str(rid_response))
         rid_char = rid.json()['reqeust_id']
         while True:
-            query = requests.get(f'{apiroot}/query?request_id={rid_char}', timeout=5, verify=False)
+            query = requests.get(f'{apiroot}/query?request_id={rid_char}', headers=headers, verify=False)
+            logging.info('break point at get_rank70')
             query_response = query.status_code
 
             if query_response != 200:
@@ -101,6 +105,7 @@ def on_arena_schedule():
     # 循环调用get_rank()直到正确获得排名信息
     while True:
         data = get_rank()
+        time.sleep(short_invl)
         if data['status'] != 'false':
             # logging.info(data)
             break
@@ -114,7 +119,7 @@ def on_arena_schedule():
     if origin_arena_ranks >= new_arena_ranks:
         origin_arena_ranks = new_arena_ranks
         logging.info('jjc:' + str(origin_arena_ranks))
-        time.sleep(short_invl)
+        # time.sleep(short_invl)
     else:
         temp_arena_ranks = origin_arena_ranks
         origin_arena_ranks = new_arena_ranks
