@@ -5,8 +5,7 @@ import sys
 import time
 import urllib3
 import requests
-import random
-from retrying import retry
+
 
 # 关闭验证警告
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
