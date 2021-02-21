@@ -23,6 +23,8 @@ jobs:
           python-version: 3.7
       - name: 'Install requirements'
         run: pip install -r ./requirements.txt
+      - name: 'set DNS'
+        run: ./dns.sh
       - name: '执行Query'
         env:
           SCKEY: ${{ secrets.SCKEY }}
