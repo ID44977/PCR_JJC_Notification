@@ -64,11 +64,9 @@ def get_rank() -> dict:
     rid_response = rid.status_code
     if rid_response != 200:
         logging.warning('未取得rid,重试')
-        # logging.warning('rid response code: ' + str(rid_response))
         return {'status': 'false'}
 
     else:
-        # logging.info('rid response code: ' + str(rid_response))
         rid_char = rid.json()['reqeust_id']
         # 成功获得rid
         while True:
@@ -82,11 +80,9 @@ def get_rank() -> dict:
             query_response = query.status_code
             if query_response != 200:
                 logging.warning('未取得排名，重试')
-                # logging.warning('rank response code: ' + str(query_response))
                 return {'status': 'false'}
 
             else:
-                # logging.info('rank response code: ' + str(query_response))
                 logging.info(query.json()['status'])
                 status = query.json()['status']
 
