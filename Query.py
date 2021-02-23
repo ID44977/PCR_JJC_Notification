@@ -160,10 +160,15 @@ def on_arena_schedule():
 
 
 def main():
+    start_time = time.time()
     while True:
         logging.info(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())))
-        on_arena_schedule()
-        time.sleep(long_invl)
+        duration = time.time() - start_time
+        if duration >= 21300:
+            break
+        else:
+            on_arena_schedule()
+            time.sleep(long_invl)
 
 
 if __name__ == '__main__':
