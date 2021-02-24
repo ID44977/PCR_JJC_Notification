@@ -26,5 +26,5 @@ jobs:
       - name: '执行Query'
         env:
           SCKEY: ${{ secrets.SCKEY }}
-          UID: ${{ secrets.UID_UNAME }}
-        run: python ./MP_Query.py
+          UID: ${{ secrets.UID }}
+        run: python ./Query.py
