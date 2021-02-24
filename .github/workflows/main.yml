@@ -5,7 +5,7 @@ name: run Query
 # Controls when the action will run. 
 on:
   schedule:
-    - cron: '0 4 * * *'
+    - cron: '0 4/6 * * *'
   watch:
     types: started
   # Allows you to run this workflow manually from the Actions tab
@@ -26,5 +26,5 @@ jobs:
       - name: '执行Query'
         env:
           SCKEY: ${{ secrets.SCKEY }}
-          UID: ${{ secrets.UID }}
-        run: python ./Query.py
+          UID: ${{ secrets.UID_UNAME }}
+        run: python ./MP_Query.py
