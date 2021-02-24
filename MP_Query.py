@@ -21,7 +21,7 @@ headers = {
 # 执行环境判断 建议统一使用secrets以免KEY泄露
 if platform.system() == 'Linux':
     SCKEY = os.environ["SCKEY"]
-    UID_UNAME = os.environ["UID_UNAME"]
+    UID_UNAME = os.environ.get("UID_UNAME", None)
 else:
     SCKEY = 'SCT****'
     # ‘13位uid 用户名’ 中间用空格相隔
