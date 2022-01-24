@@ -1,3 +1,4 @@
+JJC不击剑了，本项目停更
 # PCR_JJC_Notification
 公主连结竞技场工具  
 
